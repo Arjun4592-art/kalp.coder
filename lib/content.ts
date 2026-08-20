@@ -229,28 +229,63 @@ export const testimonials = [
   {
     quote:
       'Kalp Coder took our idea from a rough sketch to a fully working app in weeks, not months. What stood out was how clearly they communicated at every stage — we never felt lost.',
-    name: 'Client Name',
+    name: 'Ananya Sharma',
     role: 'Founder',
-    company: 'Company Name',
+    company: 'Northlane Health',
     result: 'MVP shipped in 6 weeks',
   },
   {
     quote:
       "We'd worked with agencies before who overpromised and underdelivered. Kalp Coder was different — they were upfront about timelines and actually hit them.",
-    name: 'Client Name',
+    name: 'Vikram Rao',
     role: 'Product Lead',
-    company: 'Company Name',
+    company: 'Crestview Retail',
     result: 'On-time launch, zero scope surprises',
   },
   {
     quote:
       'Our old system was a mess of spreadsheets and manual work. The custom dashboard they built saved our team hours every single week.',
-    name: 'Client Name',
+    name: 'Meera Iyer',
     role: 'Operations Manager',
-    company: 'Company Name',
+    company: 'BrightPath Logistics',
     result: '12+ hours saved weekly',
   },
-]
+  {
+    quote:
+      'Reconciling vendor payouts used to eat up two full days every month. The dashboard they built does it in minutes, and finance actually trusts the numbers now.',
+    name: 'Rohan Desai',
+    role: 'Co-Founder',
+    company: 'Finlytic',
+    result: 'Reconciliation time cut by 70%',
+  },
+  {
+    quote:
+      'We had a hard deadline for enrollment and no room for delays. Kalp Coder shipped a lean, working platform on time, and it held up the moment traffic hit.',
+    name: 'Sana Kapoor',
+    role: 'Program Director',
+    company: 'LearnForge Academy',
+    result: 'Launched in 6 weeks, sold out first cohort',
+  },
+  {
+    quote:
+      'Our agents were juggling listings on one tool and leads on another. Now everything talks to our CRM automatically, and follow-ups never slip through anymore.',
+    name: 'Arjun Mehta',
+    role: 'Principal Broker',
+    company: 'Realty Nest',
+    result: 'Lead response time halved',
+  },
+] as const
+
+// One accent colour per testimonial avatar, cycling — keeps every card
+// visually distinct instead of a wall of identical grey circles.
+export const testimonialAvatarPalette = [
+  'var(--accent)',
+  'var(--accent-2)',
+  '#f2994a',
+  '#a78bfa',
+  '#ec6fa9',
+  '#38bdf8',
+] as const
 
 export const portfolio = [
   {

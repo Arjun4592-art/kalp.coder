@@ -9,6 +9,17 @@ type TimelineItem = {
   body: string
 }
 
+// One accent colour per step, cycling — mirrors the multi-colour icon
+// badges in the reference layout while staying on-brand (accent + accent-2
+// are the two brand colours, the rest fill out the palette).
+const PALETTE = [
+  'var(--accent)',
+  'var(--accent-2)',
+  '#f2994a',
+  '#a78bfa',
+  '#ec6fa9',
+]
+
 export default function WhyTimeline({
   items,
 }: {
@@ -83,8 +94,8 @@ export default function WhyTimeline({
   // expressed as a % of that space, so the SVG (preserveAspectRatio="none")
   // and the absolutely-positioned node/text blocks always line up exactly,
   // regardless of the rendered container's real pixel size.
-  const TOP_Y = 54 // top rail of the signal trace
-  const BOT_Y = 206 // bottom rail of the signal trace
+  const TOP_Y = 84 // top rail of the signal trace
+  const BOT_Y = 176 // bottom rail of the signal trace
   const topPct = (TOP_Y / 260) * 100
   const botPct = (BOT_Y / 260) * 100
 
@@ -121,6 +132,7 @@ export default function WhyTimeline({
         {items.map((item, i) => {
           const Icon = whyIconMap[item.icon]
           const lit = i < activeCount
+          const color = PALETTE[i % PALETTE.length]
           return (
             <div
               key={item.title}
@@ -132,23 +144,36 @@ export default function WhyTimeline({
               style={{ transitionDelay: `${i * 90}ms` }}
             >
               <div
-                className={`node absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-full border-2 bg-[var(--card)] transition-colors duration-500 ${
-                  lit
-                    ? 'border-[var(--accent)] text-[var(--accent)]'
-                    : 'border-[var(--border)] text-[var(--text-muted)]'
-                }`}
+                className='node absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-full border-2 bg-[var(--card)] transition-colors duration-500'
+                style={{
+                  borderColor: lit ? color : 'var(--border)',
+                  color: lit ? color : 'var(--text-muted)',
+                }}
               >
                 <Icon className='h-4 w-4' />
                 <span
-                  className={`absolute -inset-1 rounded-full ring-2 transition-opacity duration-500 ${
-                    lit
-                      ? 'opacity-100 ring-[var(--accent)]/25'
-                      : 'opacity-0 ring-transparent'
-                  }`}
+                  className='absolute -inset-1 rounded-full ring-2 transition-opacity duration-500'
+                  style={{
+                    opacity: lit ? 1 : 0,
+                    boxShadow: lit ? `0 0 0 2px ${color}40` : 'none',
+                  }}
+                  aria-hidden
+                />
+                {/* small accent dot, echoes the marker-dot on the desktop road */}
+                <span
+                  className='absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full border-2 transition-opacity duration-500'
+                  style={{
+                    background: color,
+                    borderColor: 'var(--card)',
+                    opacity: lit ? 1 : 0,
+                  }}
                   aria-hidden
                 />
               </div>
-              <span className='font-mono-brand text-[11px] uppercase tracking-[0.15em] text-[var(--accent)]'>
+              <span
+                className='font-mono-brand text-[11px] font-semibold uppercase tracking-[0.15em]'
+                style={{ color }}
+              >
                 Step {String(i + 1).padStart(2, '0')}
               </span>
               <h3 className='mt-1.5 font-display text-sm font-semibold sm:text-base'>
@@ -163,25 +188,39 @@ export default function WhyTimeline({
       </div>
 
       {/* desktop: winding signal trace */}
-      <div className='relative hidden lg:block' style={{ height: 460 }}>
+      <div className='relative hidden lg:block' style={{ height: 400 }}>
         <svg
           aria-hidden
-          className='absolute inset-0 h-full w-full'
+          className='absolute inset-0 z-0 h-full w-full'
           viewBox='0 0 1000 260'
           preserveAspectRatio='none'
         >
+          {/* road bed — thick, soft, rounded like a physical track */}
           <path
             d={pathD}
             fill='none'
             stroke='var(--border)'
-            strokeWidth='2'
+            strokeWidth='10'
+            strokeLinecap='round'
             vectorEffect='non-scaling-stroke'
           />
+          {/* inner sheen — thin lighter line to give the road a tube/3D feel */}
+          <path
+            d={pathD}
+            fill='none'
+            stroke='var(--bg-elevated)'
+            strokeOpacity='0.8'
+            strokeWidth='4'
+            strokeLinecap='round'
+            vectorEffect='non-scaling-stroke'
+          />
+          {/* scroll-linked progress fill */}
           <path
             d={pathD}
             fill='none'
             stroke='var(--accent)'
-            strokeWidth='2'
+            strokeWidth='4'
+            strokeLinecap='round'
             vectorEffect='non-scaling-stroke'
             pathLength={1}
             strokeDasharray={1}
@@ -202,6 +241,23 @@ export default function WhyTimeline({
               />
             </circle>
           )}
+
+          {/* dark marker dot sitting on the road at every step, like the
+              reference infographic's road pins */}
+          {points.map((p, i) => {
+            const lit = i < activeCount
+            const color = PALETTE[i % PALETTE.length]
+            return (
+              <g key={i} transform={`translate(${p.x} ${p.y})`}>
+                <circle r='9' fill='#12181a' />
+                <circle
+                  r='4'
+                  fill={lit ? color : 'var(--text-muted)'}
+                  style={{ transition: 'fill 0.5s ease' }}
+                />
+              </g>
+            )
+          })}
         </svg>
 
         {items.map((item, i) => {
@@ -209,6 +265,7 @@ export default function WhyTimeline({
           const lit = i < activeCount
           const isTop = i % 2 === 0
           const leftPct = ((i + 0.5) / n) * 100
+          const color = PALETTE[i % PALETTE.length]
           return (
             <div
               key={item.title}
@@ -216,7 +273,7 @@ export default function WhyTimeline({
                 desktopItemRefs.current[i] = el
               }}
               data-index={i}
-              className={`absolute w-[19%] text-center ${
+              className={`absolute z-10 w-[18%] px-2 text-center ${
                 isTop
                   ? 'flex flex-col items-center'
                   : 'flex flex-col-reverse items-center'
@@ -230,30 +287,33 @@ export default function WhyTimeline({
               }}
             >
               <div
-                className={`node relative flex h-11 w-11 items-center justify-center rounded-full border-2 bg-[var(--bg-elevated)] transition-colors duration-500 ${
-                  lit
-                    ? 'border-[var(--accent)] text-[var(--accent)]'
-                    : 'border-[var(--border)] text-[var(--text-muted)]'
-                }`}
+                className='node relative flex h-11 w-11 items-center justify-center rounded-2xl border-2 bg-[var(--bg-elevated)] shadow-sm transition-colors duration-500'
+                style={{
+                  borderColor: lit ? color : 'var(--border)',
+                  color: lit ? color : 'var(--text-muted)',
+                }}
               >
                 <Icon className='h-4 w-4' />
                 <span
-                  className={`absolute -inset-1 rounded-full ring-2 transition-opacity duration-500 ${
-                    lit
-                      ? 'opacity-100 ring-[var(--accent)]/25'
-                      : 'opacity-0 ring-transparent'
-                  }`}
+                  className='absolute -inset-1 rounded-2xl ring-2 transition-opacity duration-500'
+                  style={{
+                    opacity: lit ? 1 : 0,
+                    boxShadow: lit ? `0 0 0 2px ${color}40` : 'none',
+                  }}
                   aria-hidden
                 />
               </div>
               <div className={isTop ? 'mt-4' : 'mb-4'}>
-                <span className='font-mono-brand text-[11px] uppercase tracking-[0.15em] text-[var(--accent)]'>
+                <span
+                  className='font-mono-brand text-[11px] font-semibold uppercase tracking-[0.15em]'
+                  style={{ color }}
+                >
                   Step {String(i + 1).padStart(2, '0')}
                 </span>
                 <h3 className='mt-1.5 font-display text-sm font-semibold sm:text-base'>
                   {item.title}
                 </h3>
-                <p className='mt-2 text-xs leading-relaxed text-[var(--text-muted)] sm:text-[13px]'>
+                <p className='mx-auto mt-2 max-w-[168px] text-xs leading-relaxed text-[var(--text-muted)] sm:text-[13px]'>
                   {item.body}
                 </p>
               </div>

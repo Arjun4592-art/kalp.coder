@@ -19,16 +19,22 @@ export default function Marquee({
               key={`${item}-${i}`}
               className={
                 light
-                  ? 'mx-6 flex items-center gap-2 whitespace-nowrap font-mono-brand text-sm text-[#9ae52a] grayscale opacity-70 transition-all duration-300 hover:opacity-100 hover:grayscale-0'
+                  ? 'group mx-6 flex items-center gap-2 whitespace-nowrap font-mono-brand text-sm text-[#4b5045] transition-colors duration-300 hover:text-[#1c2417]'
                   : 'mx-3 flex items-center gap-2 whitespace-nowrap rounded-full border border-[var(--border)] bg-[var(--card)] px-5 py-2.5 font-mono-brand text-sm text-[var(--text-muted)]'
               }
             >
               {Icon ? (
-                <Icon className='h-4 w-4 shrink-0' />
+                <Icon
+                  className={
+                    light
+                      ? 'h-4 w-4 shrink-0 grayscale opacity-70 transition-all duration-300 group-hover:opacity-100 group-hover:grayscale-0'
+                      : 'h-4 w-4 shrink-0'
+                  }
+                />
               ) : (
                 <span
                   className={`h-1.5 w-1.5 rounded-full ${
-                    light ? 'bg-[#8a8f98]' : 'bg-[var(--accent)]'
+                    light ? 'bg-[#6b7263]' : 'bg-[var(--accent)]'
                   }`}
                 />
               )}
